@@ -1,0 +1,231 @@
+---
+title: 'STAT167 Lab #1 - Spring 2021'
+author: 
+- name: Deisy Diaz Vazquez
+  email: ddiaz022@ucr.edu
+date: "2021/4/2"
+output:
+  html_document:
+    toc: yes
+---
+
+**Acknowledgment**: Part of this R Markdown template is adapted from David Dalpiaz (UIUC).
+
+# **Discussion week 1 instructions**
+This week, you will first learn the basic R Markdown syntax. 
+
+- First, download the `rmd` file from iLearn. It gives you an option to "open" or "save". Make sure that you **save** the file to the Desktop, Downloads, Documents, or any other location where you have access to.
+- Open this `rmd` file in RStudio and click `Knit -> Knit to HTML` to render it to HTML format. (If you have `LaTex` installed on your computer you can also render it to PDF format).
+- Read this `rmd` file and the rendered `html` file side-by-side, to see how this document was generated!
+- Be sure to play with this document! Change it. Break it. Fix it. The best way to learn R Markdown (or really almost anything) is to try, fail, then find out what you did wrong.
+
+Next, you will review some example code from this week's lectures. 
+
+- Read over the code and the output. If you have any questions about certain functions or parameters, it is the time to ask!
+- There are some exercises through out this document. Replace **INSERT_YOUR_ANSWER** with your own answers. Knit the file to HTML, and check your results.
+
+<font color="blue">**Please comment your R code thoroughly, and follow the R coding style guideline (https://google.github.io/styleguide/Rguide.xml). Partial credit will be deducted for insufficient commenting or poor coding styles.**</font>
+
+**Lab submission guideline**
+
+- After you completed all exercises, save your file to `FirstnameLastname-SID-lab1.rmd` and save the rendered html/pdf file to `FirstnameLastname-SID-lab1.html` or `FirstnameLastname-SID-lab1.pdf`. 
+- Submit **BOTH your source `rmd` file and the knitted `html` or `pdf` file** to **GradeScope**. Do NOT create a zip file. You can submit multiple times, you last submission will be graded.
+
+
+# RMarkdown Basics
+
+[RMarkdown](http://rmarkdown.rstudio.com/) at its core is a combination of [`R`](https://cran.r-project.org/) and [Markdown](https://daringfireball.net/projects/markdown/) used to generate reproducible reports for data analyses.
+
+Markdown and `R` are mixed together in a `.rmd` file, which can then be rendered into a number of formats including `.html`, `.pdf`, and `.docx`. There is a strong preference for using `.html` in this course. 
+
+Have a look at this `.rmd` to see how this document was generated! It should be read alongside the rendered `.html` to best understand how everything works. You can also modifying the `.rmd` along the way, and see what effects your modifications have.
+
+Formatting text is easy. **This is bold.** *This is italics.* `This text appears as monospaced.`
+
+# Test Header 1
+## Test Header 2
+### Test Header 3
+
+- Unordered list element 1.
+- Unordered list element 2.
+- Unordered list element 3.
+
+1. Ordered list element 1.
+2. Ordered list element 2.
+3. Ordered list element 3.
+
+# Packages
+
+Packages are key to using `R`. The community generated packages are a large part of `R`'s success, and it is extremely rare to perform an analysis without using at least some packages. Once installed, packages must be loaded before they are used.
+
+## Install necessary packages
+
+```{r, echo=T}
+# If you can knit the html file successfully, do not change this R code chunk
+
+# Otherwise, uncomment the two lines and install the packages.
+# You only need to run the install.packages() commands once. 
+# Then you can comment them out by adding `#` back at the beginning of each line
+
+#install.packages("rmarkdown", repos="http://cran.rstudio.com/")
+#install.packages("yaml", repos="http://cran.rstudio.com/")
+```
+
+Note that `rmarkdown` is actually a package in `R`! If `R` never prompts you to install `rmarkdown` and its associated packages when first creating an RMarkdown document, use the above command to install them manually.
+
+# Adding `R`
+
+So far we have only used Markdown to create html. This is useful by itself, but the real power of RMarkdown comes when we add `R`. There are two ways we can do this. We can use `R` code chunks, or run `R` inline.
+
+## `R` Code Chunks
+
+The following is an example of an `R` code chunk
+
+```{r example_chunk}
+# generate random normals
+set.seed(167) # feel free to change 167 to your lucky number
+x <- rnorm(100) # use <- for assignment instead of =
+```
+
+There is a lot going on here. In the `.rmd` file, notice the syntax that creates and ends the chunk. Also note that `example_chunk` is the chunk name. Everything between the start and end syntax must be valid `R` code. Chunk names are not necessary, but can become useful as your documents grow in size.
+
+## Inline `R`
+
+`R` can also be ran in the middle of exposition. For example, the mean of the data we generated is `r mean(x)`.
+
+## Chunk Options
+
+There are many [chunk options](http://yihui.name/knitr/options/). Here we first introduce two options which are frequently used: `eval` and `echo`.
+
+```{r not_run, eval = FALSE}
+?log
+x
+```
+
+Using `eval = FALSE` the above chunk displays the code, but it is not run. The `?` code pulls up documentation of a function. The `x` code prints all values inside the vector x. With `eval = FALSE` (or simply `eval = F`), there is no output displayed.
+
+```{r not_displayed, echo = FALSE}
+print("Hello World!")
+```
+
+Above, we see output, but no code! This is done using `echo = FALSE` (or simply, `echo=F`), which is often useful.
+
+# Adding Math with `LaTeX`
+
+Another benefit of RMarkdown is the ability to add [Latex for mathematics typesetting](https://www.latex-project.org/about/). Like `R` code, there are two ways we can include Latex; displaystyle and inline.
+
+Note that use of `LaTeX` is somewhat dependent on the resulting file format. For example, it cannot be used at all with `.docx`. To use it with `.pdf` you must have LaTeX installed on your machine.
+
+With `.html` the `LaTeX` is not actually rendered during knitting, but actually rendered in your browser using MathJax.
+
+## Displaystyle `LaTeX`
+
+Displaystyle is used for larger equations which appear centered on their own line.
+
+$$
+s = \sqrt{\frac{1}{n - 1}\sum_{i=1}^{n}(x_i - \bar{x})^2}
+$$
+
+## Inline LaTex
+
+We could mix LaTeX commands in the middle of exposition, for example: $t = 2$. We could actually mix `R` with Latex as well! For example: $\bar{x} = `r mean(x)`$.
+
+# **Lecture Review**
+
+## Generate sample data
+
+Recall that in the lecture, we generated 100 random normals, assigned the values into a vector `x`, then printed out some values in vector `x`.
+
+```{r}
+# generate random normals
+set.seed(167) # feel free to change 167 to your lucky number
+x <- rnorm(100) # use <- for assignment instead of =
+# print out the data or part of it
+x
+1:10
+10:1
+seq(from=1, to=10, by=2)
+seq(10, 1)
+x[1:10]
+y <- c(2,4,7)
+y
+x[y]
+length(x)
+length(x[y])
+```
+
+### **Exercise #1** 
+
+Look at the output of the following code, what happens when you select with negative index?
+
+```{r}
+x[4]
+x[-4]
+```
+
+**ANSWERS**: The command *x[-4]* will display all the values in the vector except the last four.
+
+## Calculate summary statistics
+
+We can calculate some summary statistics from the data. Here we set the option `collapse=T` for our code chunk, so that R Markdown will try to collapse all the source and output blocks from one code chunk into a single block.
+
+```{r, collapse=T}
+mean(x)
+median(x)
+
+var(x) # sample variance
+sd(x) # sample standard deviation
+
+n <- length(x)
+sum((x-mean(x))^2)/n # population variance
+mean(x^2)-(mean(x))^2 # population variance
+var(x)*(n-1)/n # population variance
+sd(x)^2*(n-1)/n # population variance
+
+summary(x)
+```
+
+### **Exercise #2** 
+
+Complete the following code to print out the maximum value and the minimum value in `x`.
+
+**ANSWERS**
+
+```{r}
+# INSERT_YOUR_ANSWER
+min(x) # this will give the min value in x
+max(x) # this will give the max value in x
+```
+
+### **Exercise #3** 
+
+The `sd()` function calculate the sample standard deviation. 
+$$ s = \sqrt{\frac{1}{n-1}\sum_{i=1}^{n}(x_i - \bar{x})^2}$$
+How to calculate the population standard deviation?
+$$ \sigma = \sqrt{\frac{1}{n}\sum_{i=1}^{n}(x_i - \bar{x})^2}$$
+
+**ANSWERS**
+
+```{r, collapse=T}
+sd(x) # sample standard deviation s
+
+# calculate the population standard deviation
+# INSERT_YOUR_ANSWER
+sqrt(sum((x-mean(x))^2)/n)
+```
+
+## Plot single data set
+
+Note that you can modify chunk options `fig.height` and `fig.width` to change the size of output plots from a particular chunk.
+
+```{r, fig.height=4, fig.width=10, fig.align = "center"}
+par(mfrow=c(1,3)) # 1-by-3 layout
+# subfigure #1
+boxplot(x, horizontal=T, col=2, border="blue", xlab="Random Numbers", main="Boxplot")
+
+# subfigure #2
+hist(x, xlab="Random Numbers", main="Histogram")
+
+# subfigure #3
+plot(density(x), main="Density Curve")
+```

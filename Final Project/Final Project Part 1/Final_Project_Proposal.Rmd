@@ -1,0 +1,128 @@
+---
+title: "Final Project Proposal"
+author: "Deisy Diaz Vazquez, Alliyah Munir, Tracy Lam, Kevin Tran, Minho Kim"
+date: "4/21/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+### Overall Objective: 
+
+Evaluating how the video game data is popular in terms of different audiences, genres, regions, etc. while measuring popularity based on user score, critic score, and sales. 
+
+### 1. What is our research question?
+
+In our research project, we are going to be evaluating a dataset with thousands of video game observations across many different platforms and genres. Through this, we will measure the popularity of different video games, differentiating them by genres, audiences, regions, companies and much more. We will be able to see how some games are more popular than others using the user score, critic score, and sales observations provided in the data. 
+
+**Research Aims/Questions:**
+
+  1. Among all of the video games, what is the most popular in the different regions (NA, Japan, Europe, Others)? Why (affordability, open to multiple audiences, new game, well known publisher)? 
+        + What video game genre is the most popular? 
+            + How have these different genres performed over the years? Did they start having lower or higher sales, etc.?
+            + Based on rating symbols distinguishing the audience type, are some video game genres more popular than others?
+        + What are the most popular games in these different regions? Do they have something in common such as genre, rating symbols, publisher, etc.?
+        + Does how well-liked a game is (based on user score and critic scores given) correlate with the amount of sales? For example, do well-rated games have a lot of sales (or vice versa)?
+            + Is there a difference between the users' scores or critic scores? Could they be playing with different things in mind? For example, users look more at enjoyment while critics look at it more critically.
+        + Does the type of gaming system have an effect in the video game sales in specific regions? Is one system’s video games more popular in a region compared to another?
+            + Do the gaming systems have a popular genre of video games?
+        + How do these publishing companies perform with sales over the years? Have they improved in sales or fall as the years have progressed?
+
+### 2. What dataset(s) will we use? 
+
+For our project we will be using a data set titled Video Game Sales with Ratings found on Kaggle.com. The data set contains 16 columns and 16720 rows. The data set consist of the following variables and descriptions: 
+
+* Name: Name of the game
+* Platform: Console on which the game is running
+* Year_of_Release: Year the game was released
+* Genre: The game’s category
+* Publisher: Game’s publisher
+* NA_Sales: Game Sales in north America (in millions of units)
+* EU_Sales: Game sales in the European Union
+* JP_Sales: Game sales in Japan
+* Other_Sales: Game sales in the rest of the world
+* Global_Sales: Total_Sales in the world
+* Critic_Score: Aggregate score compiled by Metacritic staff
+* Critic_Count: The number of critics used for Critic_Score
+* User_Score: Score by Metacritic’s subscribers
+* User_Count: Number of users who gave the user_score
+* Developer: Party responsible for creating the game
+* Rating: The ESRB rating
+
+The variables that will be the most valuable in answering our overall question will be the ones used to measure sales like **NA_Sales**, **EU_Sales**, **JP_Sales**, and variables used for scoring like **Critic_Score** and **User_Score**. While the data is fairly clean, the variables **User_Score**, **Developer**, and **Rating** all have a null percentage of 40% meaning that about 40% of the rows have no value.
+
+First we load the data: 
+
+```{r Load Data}
+setwd("C:/Users/jd100/Desktop/UCR Classes/Spring 21/Stat 167/Final Project") # Change working directory to my specific file
+Video_Game_Data <- read_csv("Video_Games_Sales.csv") # read data
+Video_Game_Data # Print to check
+
+```
+
+
+After reading the file, one of the things we can do is create a dot plot to show how the amount of sales in North America vary by genre with the following code:
+
+```{r Genre vs. North America Sales}
+ggplot(data = Video_Game_Data)+ # plot video_game_data
+  geom_point(mapping = aes( x = Genre, y = NA_Sales, color = Genre)) # using x = genre, and y = north america sales by color = genre
+
+```
+
+We can also visualize how North American Sales measure against Critic Score by genre with the following code: 
+
+```{r North America Sales vs. Critic Score}
+
+ggplot(data = Video_Game_Data) + # plot video_game_data 
+  geom_point(mapping = aes(x = NA_Sales, y = Critic_Score, color = Genre)) + # plot points x = north america sales y = critic score and color by genre
+  geom_smooth(mapping = aes(x = NA_Sales, y = Critic_Score, color = Genre ), se = F) # plot points  x = north america sales y = critic score and color by genre with no standard deviation
+
+```
+
+We can also look at each genre individually using facet wrap by plotting critic score vs european union sales with the following code: 
+
+```{r European Sales vs Critic Score by Genre}
+
+ggplot(data = Video_Game_Data) + # plot video game data
+  geom_point(mapping = aes(x = EU_Sales, y = Critic_Score)) + # plot points by european union sales  vs critic score
+  facet_wrap(~ Genre, nrow = 3) # facet wrap by genre over 3 rows
+
+```
+
+Another thing we can visualize is the measure of popularity by critic score with the following code:
+
+```{r Critic Score by Rating}
+
+ggplot(data = Video_Game_Data) + # plot video game data
+  geom_histogram(mapping = aes(x = Critic_Score, fill = Rating)) # x = critic score and fill by rating
+```
+
+### 3. What do you plan to answer with the data to answer you questions?
+
+  Using the video game dataset, we plan to create different plots and models to better understand the overall content and make conclusions about the observations. However, before answering questions using the data, some assumptions shall be made. This includes assuming the data is randomly sampled and independent to avoid biased conclusions. Additionally, we assume that all the data within each column is explicitly visible for each video game, meaning any NA observations will be removed and not used for analysis. To further ensure that the data analysis results are accurate and prevent misleading skewness, our team plans to consider both the critic's score and user score. 
+
+  After these assumptions are made, we can create models and plots to answer our questions. Our team's approach to generating plots is to (temporarily) limit the data to only include observations relevant to the question's context. This way, we are increasing user readability and reducing the likelihood of standard errors. Then, histograms and scatter plots are generated to view the overall trend, skewness, normality, etc. Additionally, ggplot2 is also helpful because it allows us to form bar charts with different positions such as "stack" and "dodge," making it easy to view the data/counts of each category on the y-axis. Box plots will also be incorporated for visualizing outliers, skewness, median, upper quartile, and lower quartile values. All in all, drawing the same conclusions from various plots ensures our team that the generated results are accurate. 
+
+  After generating the data plots, the evaluation approach that we will use is to create a conclusion for each sub-question. After reviewing all the findings, we will use them as evidence to answer significant questions. 
+
+
+### 4. What if our ideas dont work out?
+
+--->
+
+
+### 5. What makes for great data visualization?
+
+We’re going to visualize Video Games dataset using the Rstudio and in the process consider the three fundamental types of data visualizations. It's important to understand how charts can help us visualize specifically what charts say, what charts mean and what charts do.
+
+All charts say things their creators intend and many say things that were not intended. A well-designed chart lets us see a data set very closely. This can be thought of as what a chart says explicitly and we optimize for this by choosing the charting method that maximizes the ability to display and query data precision, accuracy. But charts also make implicit statements as communication medium charts or stylistic form over contents. For example, orienting a bar chart downward and shifting its color can dramatically reinforce the subject and theme of a chart and this data visualization can be even more powerful. 
+
+There’s also what charts mean to consider. There’s an intentional meaning but there’s also a historical, cultural and contextual meaning. We have to take this into account as we visualize data. 
+
+We need to have a clear idea of the audiences for our charts and the context around the data in order to communicate a cohesive story but the most important thing about a chart is its impact. A well-designed chart is one that is optimized for impact. It allows us to make very important decisions with absolute clarity. 
+
+Each row represents different video games and each column represents different sales from different regions, publisher, year of creation, and Rating. Each video game gets one of 14 labels that represents the activity they’ve done. So there’s a lot going on but you notice that some of these games have empty values. So the first thing we want to do is clean our data by removing them. After we clean our data, we’re going to transform it into graphs using ggplot. 
+
+# THE END

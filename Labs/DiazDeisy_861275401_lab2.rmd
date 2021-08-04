@@ -1,0 +1,191 @@
+---
+title: "STAT167 Lab #2 - Spring 2021"
+author: 
+- name: Deisy Diaz
+  email: ddiaz022@ucr.edu
+date: "2021/4/9"
+output:
+  html_document:
+    toc: yes
+---
+
+**Acknowledgments**: Part of this R Markdown template is adapted from David Dalpiaz (UIUC) and Cosma Shalizi (CMU).
+
+
+# **Discussion week 2 instructions**
+This week, you will first learn a bit more about R Markdown. 
+
+- First, download the `rmd` file from iLearn. It gives you an option to "open" or "save". Make sure that you **save** the file to the `Desktop`, `Downloads`, `Documents`, or any other location where you have access to.
+- Open this `rmd` file in RStudio and click `Knit -> Knit to HTML` to render it to HTML format. (If you have `LaTex` installed on your computer, you can also render it to PDF format).
+- Read this `rmd` file and the rendered `html` file side-by-side, to see how this document was generated!
+- Be sure to play with this document! Change it. Break it. Fix it. The best way to learn R Markdown (or really almost anything) is to try, fail, then find out what you did wrong.
+
+Next, you will review some visualization example figures from this week's lectures. 
+
+- Read over the code and the output. If you have any questions about certain functions or parameters, it is the time to ask!
+- There are some exercises through out this document. Replace **INSERT_YOUR_ANSWER** with your own answers. Knit the file to HTML, and check your results.
+
+<font color="blue">**Please comment your R code thoroughly, and follow the R coding style guideline (https://google.github.io/styleguide/Rguide.xml). Partial credit will be deducted for insufficient commenting or poor coding styles.**</font>
+
+**Lab submission guideline**
+
+- After you completed all exercises, save your file to `FirstnameLastname-SID-lab2.rmd` and save the rendered html/pdf file to `FirstnameLastname-SID-lab2.html` or `FirstnameLastname-SID-lab2.pdf`.
+- Submit **BOTH your source `rmd` file and the knitted `html` or `pdf` file** to **GradeScope**. Do NOT create a zip file. You can submit multiple times, you last submission will be graded.
+
+***
+
+# RMarkdown 
+
+## More Formatting in R Markdown
+
+### Paragraph Breaks and Forced Line Breaks
+To insert a break between paragraphs, include a single completely blank line.
+
+To force a line break, put _two_ blank  
+spaces at the end of a line.
+
+### Computer Type
+
+Text to be printed in a fixed-width font, without further interpretation,
+goes in paired left-single-quotes, a.k.a. "back-ticks", without line breaks
+in your typing.  (Thus `R` vs. R.)
+
+### Quotations
+Set-off quoted paragraphs are indicated by an initial `>`:
+
+> In fact, all epistemological value of the theory of probability is based on this: that large-scale random phenomena in their collective action create strict, nonrandom regularity.  [Gnedenko and Kolmogorov, _Limit Distributions for Sums of Independent Random Variables_, p. 1]
+
+### More about bullet points
+- This is a list marked where items are marked with bullet points.
+* Each item in the list should start with a `*` (asterisk) character, or a `-` (single dash) character, or a `+` (plus sign) character. You can use them interchangeably, though it is **NOT** a good practice.
++ Each item should also be on a new line.
+    - Indent lines and begin them with `*` or `+` or `-` for sub-bullets.
+    * Usually indentation by two spaces is sufficient for sub-bullets.
+    + Sub-sub-bullet aren't really a thing in R Markdown.
+
+## Math in R Markdown
+Since this is a statistics class, you need to be able to write out mathematical expressions, often long series of them. R Markdown gives you the syntax to render complex mathematical formulas and derivations, and have them displayed very nicely. Like code, the math can either be inline or set off (**displays**).
+
+Inline math is marked off with a pair of dollar signs (`$`), as $\pi r^2$ or $e^{i\pi}$.
+
+Mathematical displays are marked off with a pair of double dollar signs (`$$`) or a pair of `\[` and `\]`, as in
+
+$$
+e^{i \pi} = -1
+$$
+
+\[
+e^{i \pi} = -1
+\]
+
+For more information about the elements of Math mode, please refer to this [excellent tutorial from Dr. Shalizi](http://www.stat.cmu.edu/~cshalizi/rmarkdown/#math-in-r-markdown).
+
+
+***
+
+# **Lecture Review**
+
+## Plot single data set
+
+```{r}
+# generate random normals
+set.seed(167) # feel free to change 167 to your lucky number
+x <- rnorm(100) # use <- for assignment instead of =
+```
+
+Note that you can modify chunk options `fig.height` and `fig.width` to change the size of plots from a particular chunk.
+
+```{r, fig.height=6, fig.width=6}
+par(mfrow=c(2,2)) # 2-by-2 layout
+
+# subfigure #1
+hist(x, xlab="Random Numbers", main="Histogram")
+
+# subfigure #2
+boxplot(x, horizontal=T, col=2, border="blue", xlab="Random Numbers", main="Boxplot")
+
+# subfigure #3
+qqnorm(x, main="Q-Q plot")
+qqline(x,lwd=3, lty=4, col="blue")
+
+# subfigure #4
+plot(density(x), main="Density Curve")
+```
+
+## Plot a theoretical standard normal curve
+
+```{r, collapse=T, fig.height=6, fig.width=6}
+z <- seq(-4, 4, length=100)
+z
+
+prob.z <- dnorm(z) # calculate the standard normal densities 
+prob.z
+
+plot(z, prob.z, lwd=3, col="red", type="l") # draw the theoretical normal curve
+```
+
+### **Exercise #1** 
+
+Plot the probability density function of $N(\mu=1.2, \sigma=0.8)$.
+
+**ANSWERS** 
+
+```{r}
+# INSERT_YOUR_ANSWER
+prob_z <- dnorm(z, mean = 1.2, 0.8) #get values of the dnorm from -4 to 4 with mean 1.2 and sd = 0.8
+plot(z,prob_z, type = "l") # plot density function 
+
+```
+
+### **Exercise #2** 
+
+Can you draw these two normal curves, $N(\mu=0, \sigma=1)$ and $N(\mu=1.2, \sigma=0.8)$, in the same plot?
+
+**ANSWERS** 
+
+```{r}
+# INSERT_YOUR_ANSWER
+prob_x <- dnorm(z, mean = 0, 1) # get dnorm values for mean = 0 and sd = 1
+prob_y <- dnorm(z, mean = 1.2, 0.8) # get dnorm values for mean = 1.2 and sd = 0.8
+plot(z, prob_x, col = "red", ylim = c(0,1), type = "l") # plot the first density curve color red
+lines(z, prob_y, col = "blue") # plot the second density curve color blue
+```
+
+
+***
+
+## Scatter plot of two data sets
+
+```{r, fig.height=6, fig.width=6}
+y <- rnorm(n=100, mean=1, sd=.5)
+plot(x,y, pch=16)
+```
+
+## Annotate your scatter plot
+```{r, fig.height=6, fig.width=6}
+plot(x, y, pch=16)
+points(x[y > 1.5], y[y > 1.5], col=2, pch=2, lwd=5)
+points(x[x < -1], y[x < -1], col=3, pch=3, lwd=5) # do not write as x[x<-1]
+legend("topleft", legend=c("y > 1.5","x < -1"), col=c(2,3), pch=c(2,3))
+abline(v=0, col=4)
+lines(x=c(-2,2), y=c(0,1.5), lty=2)
+```
+
+### **Exercise #3** 
+
+Annotate your own scatter plot:
+
+- select points with x < -2 (leave space on both sides of `<`), color them in red and change their point symbol (to anything other than solid points)
+- add a legend at the right bottom of the figure indicating those red color points are "likely outliers"
+- add a blue dashed horizontal line at $\bar{y}$  
+
+**ANSWERS** 
+
+```{r}
+plot(x,y, pch=16)
+y.bar <- mean(y) # it does not necessarily equal to 1.0
+# INSERT_YOUR_ANSWER
+points(x[x < -2], y[x < -2], col=2, pch=2, lwd=5) # plot x and y values of which x < -2, red triangles
+abline(h = y.bar, lty = 2, col = "blue") # draw a blue dashed line at y.bar
+legend("topleft", legend="x < -2", col=2, pch=2) # make a legend that says red triangles are for values with x < -2
+```

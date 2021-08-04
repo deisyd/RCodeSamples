@@ -1,0 +1,288 @@
+---
+title: "Exploratory Analysis for Final Project"
+author: "Deisy Diaz"
+date: "5/4/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.width = 16, fig.height = 8)
+library(tidyverse)
+library(dplyr)
+library(ggplot2)
+library(gridExtra)
+
+```
+
+# Question
+#### Does the type of gaming platform have an effect in the video game sales in specific regions? Is one platform more popular in a region compared to another?
+
+
+```{r Load Data}
+setwd("C:/Users/jd100/Desktop/UCR Classes/Spring 21/Stat 167/Final Project")
+video_game_data <- read_csv("Video_Games_Sales.csv")
+
+```
+
+
+```{r}
+
+video_game_data <- 
+  video_game_data %>%
+  filter(!is.na(Name), !is.na(Platform), !is.na(Year_of_Release), !is.na(Genre), !is.na(Publisher), !is.na(NA_Sales), !is.na(EU_Sales), !is.na(JP_Sales), !is.na(Other_Sales), !is.na(Global_Sales))
+
+video_game_data$User_Score <- 
+  as.numeric(video_game_data$User_Score)
+video_game_data
+```
+
+```{r}
+# Action, shooter
+plot1 <- ggplot(video_game_data, mapping = aes(x = reorder(Platform, NA_Sales, FUN = median), y = NA_Sales)) +
+  geom_boxplot() +
+  ylab("North America's Sales") +
+  xlab("") +
+  coord_flip()
+
+plot2 <- ggplot(video_game_data, mapping = aes(x = reorder(Platform, EU_Sales, FUN = median), y = EU_Sales)) +
+  geom_boxplot() +
+  ylab("Europe's Sales") +
+  xlab("") +
+  coord_flip()
+
+plot3 <- ggplot(video_game_data, mapping = aes(x = reorder(Platform, JP_Sales, FUN = median), y = JP_Sales)) +
+  geom_boxplot() +
+  ylab("Japan's Sales") +
+  xlab("") +
+  coord_flip()
+
+plot4 <- ggplot(video_game_data, mapping = aes(x = reorder(Platform, Other_Sales, FUN = median), y = Other_Sales)) +
+  geom_boxplot() +
+  ylab("Other Sales") +
+  xlab("") +
+  coord_flip()
+
+grid.arrange(plot1, plot2, plot3, plot4, ncol = 4)
+
+```
+From the plots above, we see that the 2600 gaming platform is number 1 in North America, where as it is number 14 in Europe, and number 31 in Japan and other. As for Europe's number one platform, the PS4, it is number 14 in North America, number 17 in Japan, and number 1 in Other. Japan's number 1 platform is NES, whereas it is number 2 in North America and Europe, and number 11 in other. For other sales, the PS4 is also the number 1 platform. 
+
+```{r}
+
+grouped_video_game <- 
+  video_game_data %>%
+  group_by(Platform)
+grouped_video_game
+
+grouped_video_game %>%
+  count() %>%
+  filter(n == 1)
+
+grouped_video_game %>%
+  filter(Platform == "GG"| Platform == "PCFX")
+
+games_with_sales <- video_game_data %>%
+  filter(NA_Sales > 0| EU_Sales > 0| JP_Sales > 0| Other_Sales > 0)
+
+games_with_sales
+
+```
+```{r}
+
+mean_over_zero <- grouped_video_game %>%
+  mutate(avg_NA_sales = mean(NA_Sales),
+         avg_EU_sales = mean(NA_Sales),
+         avg_JP_sales = mean(JP_Sales),
+         avg_Other_sales = mean(Other_Sales)) %>%
+  filter(avg_NA_sales > 0 | avg_EU_sales >0| avg_JP_sales > 0 | avg_Other_sales > 0)
+
+mean_over_zero
+
+video_game_data %>%
+  filter(Platform == "GEN" | Platform == "GG") %>%
+  group_by(Platform) %>%
+  mutate(mean_NA_sales = mean(NA_Sales),
+         mean_EU_sales = mean(EU_Sales),
+         mean_JP_sales = mean(JP_Sales))
+```
+
+
+```{r}
+sales_by_mean <- 
+video_game_data %>%
+  group_by(Platform) %>%
+  mutate(mean_NA_Sales = mean(NA_Sales),
+         mean_EU_Sales = mean(EU_Sales),
+         mean_JP_Sales = mean(JP_Sales),
+         mean_Other_Sales = mean(Other_Sales)) #%>%
+  #arrange(desc(mean_NA_sales))
+
+#arranged_by_NA <-
+ # sales_by_mean %>% 
+  #group_by(Platform) %>%
+  #arrange(desc(mean_NA_Sales))
+
+#arranged_by_EU <- 
+#  sales_by_mean %>%
+#  arrange(desc(mean_EU_Sales))
+
+#arranged_by_JP <- 
+#  sales_by_mean %>%
+#  arrange(desc(mean_JP_Sales))
+
+#arranged_by_Other <- 
+#  sales_by_mean %>%
+#  arrange(desc(mean_Other_Sales))
+
+plot1a <- ggplot(sales_by_mean, mapping = aes(x = reorder(Platform, mean_NA_Sales, FUN = median), y = mean_NA_Sales)) +
+  geom_point() +
+  ylab("North America's Sales") +
+  xlab("") +
+  coord_flip()
+
+plot2a <- ggplot(sales_by_mean, mapping = aes(x = reorder(Platform, mean_EU_Sales, FUN = median), y = mean_EU_Sales)) +
+  geom_point() +
+  ylab("Europe's Sales") +
+  xlab("") +
+  coord_flip()
+
+plot3a <- ggplot(sales_by_mean, mapping = aes(x = reorder(Platform, mean_JP_Sales, FUN = median), y = mean_JP_Sales)) +
+  geom_point() +
+  ylab("Japan's Sales") +
+  xlab("") +
+  coord_flip()
+
+plot4a <- ggplot(sales_by_mean, mapping = aes(x = reorder(Platform, mean_Other_Sales, FUN = median), y = mean_Other_Sales)) +
+  geom_point() +
+  ylab("Other Sales") +
+  xlab("") +
+  coord_flip()
+
+grid.arrange(plot1a, plot2a, plot3a, plot4a, plot1, plot2, plot3, plot4, ncol = 4)
+
+```
+
+When comparing the data of average sales, in north America, the number 1 platform is NES as well as Japan. But number 4 in Europe, and number 8 in other regions. In Europe the GB platform is number 1 whereas in North America and Japan it's number 2, and number 4 in Other regions. In other regions, the PS4 is number one, number 11 in north America, number 2 in Europe, and number 22 in Japan.
+
+# Question 2
+
+```{r}
+
+sales_by_mean %>%
+  arrange(NA_Sales)
+
+sales_by_mean %>%
+  arrange(EU_Sales)
+
+sales_by_mean %>%
+  arrange(JP_Sales)
+
+sales_by_mean %>%
+  arrange(Other_Sales)
+
+```
+
+# Question 2 part A
+```{r Scores by user}
+
+cleaned_scores <- 
+  video_game_data %>%
+  filter(User_Score != "tbd", !is.na(User_Score), !is.na(Critic_Score))
+
+cleaned_scores$Critic_Score <- # make critic score on the same scale as user score
+  cleaned_scores$Critic_Score/10
+
+cleaned_scores %>%
+  arrange(desc(Critic_Score))
+
+plota<- ggplot(cleaned_scores) +
+  geom_point(mapping = aes(x = User_Score, y = NA_Sales)) +
+  geom_smooth(mapping = aes(x = User_Score, y = NA_Sales), se = F)
+
+plotb <- ggplot(cleaned_scores) +
+  geom_point(mapping = aes(x = User_Score, y = EU_Sales)) +
+  geom_smooth(mapping = aes(x = User_Score, y = EU_Sales), se = F)
+
+plotc <- ggplot(cleaned_scores) +
+  geom_point(mapping = aes(x = User_Score, y = JP_Sales)) +
+  geom_smooth(mapping = aes(x = User_Score, y = JP_Sales), se = F)
+
+plotd <- ggplot(cleaned_scores) +
+  geom_point(mapping = aes(x = User_Score, y = Other_Sales)) +
+  geom_smooth(mapping = aes(x = User_Score, y = Other_Sales), se = F)
+
+grid.arrange(plota, plotb, plotc, plotd, ncol = 4)
+
+```
+
+
+
+```{r}
+
+plota1<- ggplot(cleaned_scores) +
+  geom_point(mapping = aes(x = Critic_Score, y = NA_Sales)) +
+  geom_smooth(mapping = aes(x = Critic_Score, y = NA_Sales))
+
+plotb1<- ggplot(cleaned_scores) +
+  geom_point(mapping = aes(x = Critic_Score, y = EU_Sales)) +
+  geom_smooth(mapping = aes(x = Critic_Score, y = EU_Sales))
+
+plotc1<- ggplot(cleaned_scores) +
+  geom_point(mapping = aes(x = Critic_Score, y = JP_Sales)) +
+  geom_smooth(mapping = aes(x = Critic_Score, y = JP_Sales))
+
+plotd1<- ggplot(cleaned_scores) +
+  geom_point(mapping = aes(x = Critic_Score, y = Other_Sales)) +
+  geom_smooth(mapping = aes(x = Critic_Score, y = Other_Sales))
+
+grid.arrange(plota1, plotb1, plotc1, plotd1, ncol = 4)
+
+navscritic <- lm(NA_Sales ~ Critic_Score, cleaned_scores) 
+summary(navscritic)
+
+euvscritic <- lm(EU_Sales ~ Critic_Score, cleaned_scores) 
+summary(euvscritic)
+
+jpvscritic <- lm(JP_Sales ~ Critic_Score, cleaned_scores) 
+summary(jpvscritic)
+
+othervscritic <- lm(Other_Sales~Critic_Score, cleaned_scores)
+summary(othervscritic)
+
+```
+
+# Question 2b
+
+```{r}
+# Did this by genre instead of each specific game
+
+grouped_by_genre <- 
+  cleaned_scores %>%
+  group_by(Genre)
+
+plotaa <- ggplot( data = grouped_by_genre) +
+  geom_freqpoly(mapping = aes(x = User_Score, color = Genre)) 
+
+plotab <- ggplot( data = grouped_by_genre) +
+  geom_freqpoly(mapping = aes(x = Critic_Score, color = Genre))
+
+grid.arrange(plotaa, plotab, ncol = 2)
+  
+```
+
+
+```{r}
+
+ggplot(data = cleaned_scores) +
+  geom_point(mapping = aes(x = User_Score, y = Critic_Score)) +
+  geom_smooth(mapping = aes(x = User_Score, y = Critic_Score), se = F) +
+  facet_grid( ~ Genre)
+
+ggplot(data = cleaned_scores) +
+  geom_point(mapping = aes(x = User_Score, y = Critic_Score)) +
+  geom_smooth(mapping = aes(x = User_Score, y = Critic_Score), se = F) +
+  facet_grid( ~ Genre)
+
+uservscritic <- lm(Critic_Score ~ User_Score, data = cleaned_scores)
+summary(uservscritic)
+```

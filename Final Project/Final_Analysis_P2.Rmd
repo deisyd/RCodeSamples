@@ -1,0 +1,159 @@
+---
+title: "167 Final Explore Pt2"
+author: "Deisy Diaz"
+date: "5/25/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.width = 12, fig.height = 6)
+library(ggplot2)
+library(tidyverse)
+library(gridExtra)
+
+```
+
+## Does the type of gaming platform have an effect in the video game sales in specific regions? Is one platform more popular in a region compared to another?
+
+```{r Load Data}
+setwd("C:/Users/jd100/Desktop/UCR Classes/Spring 21/Stat 167/Final Project")
+video_game_data <- read_csv("Video_Games_Sales.csv")
+
+```
+
+```{r}
+# Worst genres are Action, Sports, and Misc
+video_game_data <- 
+  video_game_data %>%
+  filter(!is.na(Name), !is.na(Platform), !is.na(Year_of_Release), !is.na(Genre), !is.na(Publisher), !is.na(NA_Sales), !is.na(EU_Sales), !is.na(JP_Sales), !is.na(Other_Sales), !is.na(Global_Sales))
+
+worst_genres <-
+  video_game_data %>%
+  filter(Genre == "Action" | Genre == "Shooter")
+worst_genres
+
+```
+
+
+
+
+```{r}
+
+count_worst_genre <- 
+  worst_genres %>%
+  count(Genre)
+count_worst_genre
+
+plot1 <- ggplot(worst_genres, mapping = aes(x = reorder(Platform, NA_Sales, FUN = median), y = NA_Sales)) +
+  geom_boxplot() +
+  ylab("North America's Sales") +
+  xlab("") +
+  coord_flip()
+
+plot2 <- ggplot(worst_genres, mapping = aes(x = reorder(Platform, EU_Sales, FUN = median), y = EU_Sales)) +
+  geom_boxplot() +
+  ylab("Europe's Sales") +
+  xlab("") +
+  coord_flip()
+
+plot3 <- ggplot(worst_genres, mapping = aes(x = reorder(Platform, JP_Sales, FUN = median), y = JP_Sales)) +
+  geom_boxplot() +
+  ylab("Japan's Sales") +
+  xlab("") +
+  coord_flip()
+
+plot4 <- ggplot(worst_genres, mapping = aes(x = reorder(Platform, Other_Sales, FUN = median), y = Other_Sales)) +
+  geom_boxplot() +
+  ylab("Other Sales") +
+  xlab("") +
+  coord_flip()
+
+grid.arrange(plot1, plot2, plot3, plot4, ncol = 4)
+
+```
+
+
+```{r}
+
+worst_action <- filter(worst_genres, Genre == "Action")
+
+plot1 <- ggplot(worst_action, mapping = aes(x = reorder(Platform, NA_Sales, FUN = median), y = NA_Sales)) +
+  geom_boxplot() +
+  ylab("North America's Sales") +
+  xlab("") +
+  coord_flip()
+
+plot2 <- ggplot(worst_action, mapping = aes(x = reorder(Platform, EU_Sales, FUN = median), y = EU_Sales)) +
+  geom_boxplot() +
+  ylab("Europe's Sales") +
+  xlab("") +
+  coord_flip()
+
+plot3 <- ggplot(worst_action, mapping = aes(x = reorder(Platform, JP_Sales, FUN = median), y = JP_Sales)) +
+  geom_boxplot() +
+  ylab("Japan's Sales") +
+  xlab("") +
+  coord_flip()
+
+plot4 <- ggplot(worst_action, mapping = aes(x = reorder(Platform, Other_Sales, FUN = median), y = Other_Sales)) +
+  geom_boxplot() +
+  ylab("Other Sales") +
+  xlab("") +
+  coord_flip()
+
+grid.arrange(plot1, plot2, plot3, plot4, ncol = 4)
+
+
+```
+
+
+
+
+```{r}
+
+worst_shooter <- filter(worst_genres, Genre == "Shooter")
+
+plot1 <- ggplot(worst_sports, mapping = aes(x = reorder(Platform, NA_Sales, FUN = median), y = NA_Sales)) +
+  geom_boxplot() +
+  ylab("North America's Sales") +
+  xlab("") +
+  coord_flip()
+
+plot2 <- ggplot(worst_sports, mapping = aes(x = reorder(Platform, EU_Sales, FUN = median), y = EU_Sales)) +
+  geom_boxplot() +
+  ylab("Europe's Sales") +
+  xlab("") +
+  coord_flip()
+
+plot3 <- ggplot(worst_sports, mapping = aes(x = reorder(Platform, JP_Sales, FUN = median), y = JP_Sales)) +
+  geom_boxplot() +
+  ylab("Japan's Sales") +
+  xlab("") +
+  coord_flip()
+
+plot4 <- ggplot(worst_sports, mapping = aes(x = reorder(Platform, Other_Sales, FUN = median), y = Other_Sales)) +
+  geom_boxplot() +
+  ylab("Other Sales") +
+  xlab("") +
+  coord_flip()
+
+grid.arrange(plot1, plot2, plot3, plot4, ncol = 4)
+
+
+```
+
+
+```{r Worst Action}
+
+Worst_overall_action <- 
+  video_game_data %>%
+  filter(Genre == "Action", Platform == "3DS", Global_Sales <= 0.0600)
+Worst_overall_action
+
+worst_overall_shooter <- 
+  video_game_data %>%
+  filter(Genre == "Shooter", Platform ==  "DC", Global_Sales <= 0.0600)
+worst_overall_shooter
+```
+
+

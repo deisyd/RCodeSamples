@@ -1,0 +1,218 @@
+---
+title: "STAT167 Lab #3 - Spring 2021"
+author: 
+- name: Deisy Diaz
+  email: ddiaz022@ucr.edu
+date: "2021/4/16"
+output:
+  html_document:
+    toc: yes
+---
+
+# **Discussion week 3 instructions**
+
+This week, we will review some `ggplot2` example figures from the lectures. 
+
+- First, download the `rmd` file from iLearn. 
+- Open this `rmd` file in RStudio and click `Knit -> Knit to HTML` to render it to HTML format. (The computer lab computers do not have `LaTex` installed so you can not render it to PDF format).
+- Read this `rmd` file and the rendered `html` file side-by-side, to see how this document was generated!
+- Be sure to play with this document! Change it. Break it. Fix it. The best way to learn R Markdown (or really almost anything) is to try, fail, then find out what you did wrong.
+
+- Read over the `ggplot2` example code and check the output. If you have any questions about certain functions or parameters, it is the time to ask!
+- There are some exercises through out this document. Replace **INSERT_YOUR_ANSWER** with your own answers. Knit the file to HTML, and check your results.
+
+<font color="blue">**Please comment your R code thoroughly, and follow the R coding style guideline (https://google.github.io/styleguide/Rguide.xml). Partial credit will be deducted for insufficient commenting or poor coding styles.**</font>
+
+**Lab submission guideline**
+
+- After you completed all exercises, save your file to `FirstnameLastname-SID-lab3.rmd` and save the rendered html/pdf file to `FirstnameLastname-SID-lab3.html` or `FirstnameLastname-SID-lab3.pdf`.
+- Submit **BOTH your source `rmd` file and the knitted `html` or `pdf` file** to **GradeScope**. Do NOT create a zip file. You can submit multiple times, you last submission will be graded.
+
+***
+
+# **Lecture Review - `ggplot2`**
+
+## Install the `tidyverse` package
+
+```{r, collapse=T}
+# install the tidyverse package first if you have not done it  yet.
+#install.packages("tidyverse") # you can comment out this line after you have installed `tidyverse`
+library(tidyverse)
+```
+
+## The `mpg` data set
+
+This data set contains fuel economy data 1999 - 2008 for 38 popular car models (source: EPA. [fueleconomy.com/](http://fueleconomy.gov)).
+
+```{r, collapse=T}
+?mpg
+dim(mpg)  # dimension of the table
+mpg  # print/view mpg (we will introduce tibble later in this class)
+str(mpg)  # list the structures in mpg
+glimpse(mpg) # get a glimpse of the mpg data
+```
+
+
+## The complete graphing template in `ggplot2`
+```{r, eval=F}
+ggplot(data = <DATA>) + 
+  <GEOM_FUNCTION>(
+     mapping = aes(<MAPPINGS>),
+     stat = <STAT>,        # optional
+     position = <POSITION> # optional
+  ) +
+  <COORDINATE_FUNCTION> +  # optional
+  <FACET_FUNCTION> +       # optional
+  <SCALE_FUNCTION> +       # optional
+  <THEME_FUNCTION>         # optional
+```
+
+## Example: aesthetic mappings for both `geom_point()` and `geom_smooth()`
+
+```{r, collapse=T}
+ggplot(data = mpg, 
+       mapping = aes(x = displ, y = hwy, col = drv) # global mapping
+       ) +
+  geom_point() +
+  geom_smooth(mapping = aes(linetype = drv)) # local mapping for the layer
+```
+
+### **Exercise #1**
+Write your own `ggplot2` code to make a scatterplot of `cty` against `displ`; add a regression line to your plot; map `drv` to the color aesthetic for both points and lines; map `cyl` to the `size` aesthetic for points. 
+
+**ANSWER:**
+```{r, collapse=T}
+ggplot(data = mpg, 
+       mapping = aes(x = displ, y = cty, col = drv) # global mapping
+       ) +
+  geom_point(mapping = aes(size = cyl)) +
+  geom_smooth(mapping = aes(color = drv)) # local mapping for the layer
+```
+
+
+What you can conclude from your figure?
+
+**ANSWER:** As the cylinder size grows so does displacement but city mileage decreases.
+
+
+## Facets - making subplots that each display one subset of the data.
+
+### Facets by a single variable - `facet_wrap()`
+
+```{r}
+ggplot(data = mpg) + 
+  geom_point(mapping = aes(x = displ, y = hwy)) + 
+  facet_wrap(~ class, nrow = 2)
+```
+
+### Facets by a combination of two variables - `facet_grid()`
+
+```{r}
+ggplot(data = mpg) + 
+  geom_point(mapping = aes(x = displ, y = hwy)) + 
+  facet_grid(drv ~ cyl)
+```
+
+### **Exercise #2**
+
+(a) Look at the following code and output figure. What happens if you facet on a continuous variable?
+
+```{r}
+ggplot(data = mpg) + 
+  geom_point(mapping = aes(x = cyl, y = hwy)) + 
+  facet_wrap(~ displ, nrow=4)
+```
+
+**ANSWER:** If you facet along a continous variable, it will print out points for every single value.
+
+(b) Look at the following code and output figures. What does `.` do?
+
+```{r}
+ggplot(data = mpg) + 
+  geom_point(mapping = aes(x = displ, y = hwy)) + 
+  facet_grid(. ~ class)
+```
+
+```{r}
+ggplot(data = mpg) + 
+  geom_point(mapping = aes(x = displ, y = hwy)) + 
+  facet_grid(class ~ .)
+```
+
+**ANSWER:** The dot determines whether the plots are horizontal(when dot is on the right side) or vertical(when dot is on the left side).
+
+## The `diamonds` data set
+
+This data set contains the prices and other attributes of almost 54,000 diamonds. 
+
+```{r, collapse=T}
+?diamonds
+dim(diamonds)  # dimension of the table
+diamonds # print/view diamonds
+str(diamonds)  # list the structures in diamonds
+glimpse(diamonds) # get a glimpse of the data
+```
+
+### **Exercise #3** 
+Which variables in `diamonds` are categorical? Which variables are numerical? 
+
+**ANSWER: ** Variables cut, color, clarity, are categorical. The rest are numerical, carat, depth, table, price, x, y, z. 
+
+## geom vs stat functions
+
+Statistical transformation is a alternative way to build a layer.
+
+Most geoms and stats come in pairs that are almost always used in concert. 
+
+- every geom has a default stat
+- every stat has a default geom. 
+
+You can typically use geoms without worrying about the underlying statistical transformation. 
+
+You can also use geoms and stats interchangeably.
+
+## Example: `geom_bar()` calls `stat_count()` make bar plot for a categorical variable 
+
+```{r}
+ggplot(data = diamonds) + 
+  geom_bar(mapping = aes(x = cut))
+ggplot(data = diamonds) + 
+  stat_count(mapping = aes(x = cut))
+```
+
+## Override default stat function
+
+To make a proportion bar chart (relative frequency histogram), we need to override the default `group` argument and map the variable `..prop..` (calculated by `stat_count() `) to the `y` aesthetic.
+
+```{r}
+ggplot(data = diamonds) + 
+  geom_bar(mapping = aes(x = cut, y = ..prop.., group = 1))
+```
+
+
+## Example: position adjustment options for `geom_bar()` 
+
+```{r, collapse=T}
+?geom_bar
+```
+
+The position argument specifies the position adjustment of bars, rectangles.
+
+- **default**: position = "stack"
+- position = "identity" will place each object exactly where it falls in the context of the graph. 
+- position = "fill" works like stacking, but makes each set of stacked bars the same height. 
+- position = "dodge" places overlapping objects directly beside one another. 
+the bars are automatically stacked. Each colored rectangle represents a combination of cut and clarity.
+
+
+```{r, collapse=T, fig.height=5}
+#install.packages("gridExtra") # you only need to install it once
+library(gridExtra)
+gg <- ggplot(data = diamonds,
+             mapping = aes(x = cut, fill = clarity)) 
+plot1 <- gg + geom_bar(position="stack")
+plot2 <- gg + geom_bar(position="identity")
+plot3 <- gg + geom_bar(position="fill")
+plot4 <- gg + geom_bar(position="dodge")
+grid.arrange(plot1, plot2, plot3, plot4, ncol=2)
+```

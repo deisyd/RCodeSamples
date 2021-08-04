@@ -1,0 +1,358 @@
+---
+title: 'STAT167 HW4 - Spring 2021'
+author: 
+- name: Deisy Diaz Vazquez
+  email: ddiaz022@ucr.edu
+output:
+  html_document:
+    toc: yes
+    toc_depth: 4
+---
+
+## **Homework #4 instructions**
+
+**Review textbook [Chapter 5 "Data transformation"](https://r4ds.had.co.nz/transform.html) and [Chapter 7 "Exploratory Data Analysis"](https://r4ds.had.co.nz/exploratory-data-analysis.html), as well as lecture notes on `dplyr` (2021/4/27) and EDA (2021/4/29) before answering the homework questions**.
+
+This homework contains 1 question with multiple parts, 100 points in total.
+
+<font color="blue">Replace **INSERT_YOUR_ANSWER** with your own answers.</font>
+
+- First open this `rmd` file in RStudio and click `knnit -> Knit HTML` to render it to HTML format. 
+- It is best to read this `rmd` file and the rendered `html` file side-by-side, while you are working on this homework.
+- If the question asks you to write some R code, remember to put your code into a **R code chunk**. Make sure both your R code chunk and the output messages / figures are visible in the rendered `html` file.
+- For this homework, use **ggplot2** and **dplyr** to visualize and transform your data.
+
+- <font color="blue">**Please comment your R code thoroughly, and follow the R coding style guideline (https://google.github.io/styleguide/Rguide.xml). Partial credit will be deducted for insufficient commenting or poor coding styles.**</font>
+
+- If you have any question about this homework assignment, we encourage you to post it on [**Piazza**](http://piazza.com/ucr/spring2021/stat167/home).
+
+### **Homework submission guideline**
+
+- **This homework is DUE at _11:59 PM_ on _Sunday May 2nd, 2021_**.
+- Late submission penalties.  
+    - Submissions up to 24 hours late will incur a 10% deduction.  
+    - Submissions up to 48 hours late will incur a 30% deduction.
+
+- <font color="blue">**If you are using one or both of your free late days, please state here: **</font> **I will be using my free pass**
+
+- After you complete all questions, save your `rmd` file to `FirstnameLastname-SID-HW4.rmd` and save the rendered `html` or `pdf` file to `FirstnameLastname-SID-HW4.html` or `FirstnameLastname-SID-HW4.pdf`.
+- Submit **BOTH your source `rmd` file and the knitted `html` or `pdf` file** to **GradeScope**. Do NOT create a zip file. You can submit multiple times, you last submission will be graded.
+***
+
+## **Acknowledgements**
+
+<font color="blue">Please list all the help you have received for completing this homework.</font>
+
+**INSERT_YOUR_ANSWER**
+
+***
+
+**Load necessary packages**
+
+\footnotesize
+```{r, collapse=T}
+# install.packages("tidyverse")
+library(tidyverse) # for `ggplot2` and `dplyr`
+
+# You need to install the nycflights13 package first, then you can comment out the following line.
+# install.packages("nycflights13")
+library(nycflights13)
+```
+
+***
+
+## **Question 1 [100pt] Exploratory data analysis of the `nycflights13` data sets**
+
+In this question, we will take a close look at the `nycflights13::flights` data set which contains all 336,776 flights that departed from New York City in 2013. The data comes from the [US Bureau of Transportation Statistics](http://www.transtats.bts.gov/DatabaseInfo.asp?DB_ID=120&Link=0).
+
+```{r, collapse=T}
+?flights # full documentation
+# View(flights) # see the data in RStudio Viewer
+flights
+```
+
+There are some missing values in the data set which were caused by **canceled flights**. You can clean the `flights` data by removing flight record that has missing values in `dep_delay` or `arr_delay`, and save the **non-canceled** flights in a new tibble `not_canceled`.
+
+```{r, collapse=T}
+not_canceled <- filter(flights, !is.na(dep_delay), !is.na(arr_delay))
+not_canceled
+```  
+
+In the following questions, you will use `ggplot2` and `dplyr` functions to perform exploratory data analysis. 
+
+<font color="blue">If not specified, flight delays usually refer to **arrival delays**</font>.
+
+### (a) [15pt] Pick observations by their values - `filter()`
+
+Find the **non-canceled** flights that satisfy each of the following conditions.
+
+(i) Had an arrival delay of two or more hours
+
+**ANSWER**
+```{r}
+# fliter flights by arrival delay over two hours 
+filter(not_canceled, arr_delay >= 120)
+
+```
+
+(ii) Were operated by United, American, or Delta
+
+**ANSWER**
+
+```{r}
+# filter flights by operators of UA, AA, DL
+filter(not_canceled, carrier == "UA" | carrier == "AA" | carrier == "DL")
+
+```
+
+(iii) Arrived more than two hours late, but didn't leave late
+
+**ANSWER**
+
+```{r}
+# filter flights by arravial delay over two hours and no departure delay
+filter(not_canceled, arr_delay > 120, dep_delay <= 000)
+
+```
+(iv) Departed between midnight and 6am (inclusive)
+
+**ANSWER**
+
+```{r}
+
+# filter flights by departure time after midnight and 6 am 
+filter(not_canceled, dep_time >= 000 && dep_time < 600)
+
+```
+***
+
+### (b) [10pt] Reorder the rows - `arrange()`
+
+Find the following **non-canceled** flights. 
+
+(i) Find the top five most delayed flights. Report the flight date, origin, destination, carrier, flight number, and  arrival delay.
+
+**ANSWER**
+
+```{r}
+# arrance flights by arravial delay in descending order
+arrange(not_canceled, desc(arr_delay))
+
+```
+
+(ii) Find the flights traveled the longest by distance. What are the carrier, the origin airport, and the destination airport of these flights?
+
+**ANSWER**
+
+```{r}
+# arrange flights by distance in descending order
+arrange(not_canceled, desc(distance))
+
+```
+***
+
+### (c) [5pt] Pick variables by their names - `select()`
+
+List at least three ways to select `dep_time`, `dep_delay`, `arr_time`, and `arr_delay` from **non-canceled** flights.
+
+**ANSWER**
+
+```{r}
+# select columns by name
+select(not_canceled, dep_time, dep_delay, arr_delay)
+# select by column nu,ber
+select(not_canceled, c(4,6,9))
+# select by removing all other columns
+select(not_canceled, -c(1,2,3,5,7,8,10,11,12,13,14,15,16,17,18,19))
+
+```
+
+***
+
+### (d) [20pt] Create new variables with functions of existing variables - `mutate()`
+
+(i) For the **non-canceled** flights, use the `mutate()` function to create a new variable `flight_time` which equals `arr_time` - `dep_time`. Make a scatter plot to compare `flight_time` with `air_time`.
+
+**ANSWER**
+
+```{r}
+# new variable flight time in not_canceled
+flights_time <- mutate(not_canceled, flight_time = arr_time - dep_time)
+
+# plot the data with x = flight time and y = air time
+ggplot(data = flights_time) +
+  geom_point(mapping = aes(x = flight_time, y = air_time))
+```
+
+(ii) What do you expect to see? What do you see? Why are there negative values in `flight_time`?
+
+**ANSWER**
+There are negative values because if a flight arrives after midnight, i.e after 0000, the departure time will be greater than it thus giving a negative value. 
+
+(iii) Fix your R code to correct the negative values in `flight_time`. Make the scatter plot again. 
+
+**Hint:** The `lubridate` package would be helpful. Check out our textbook **[Chapter 16 "Dates and times"](http://r4ds.had.co.nz/dates-and-times.html)**
+
+**INSERT_YOUR_ANSWER**
+
+```{r}
+library(lubridate)
+
+flights_time <- mutate(flights_time, 
+                       new_arr_time = make_datetime(year, month, day, arr_time%/%100, arr_time%%100),
+                       new_dep_time = make_datetime(year, month, day, dep_time%/%100, dep_time%%100),
+                       new_flight_time = new_arr_time - new_dep_time)
+flights_time
+
+for(i in 1:length(flights_time)){
+  if(flights_time$new_flight_time[i] < 0){
+    flights_time$new_flight_time[i] <- (flights_time$new_flight_time[i] + 60*24) * (-1)
+  }
+}
+
+ggplot(data = flights_time) +
+  geom_point(mapping = aes(x = new_flight_time, y = air_time))
+```
+
+
+***
+
+### (e) **[Extra Credit 20pt]** More on date and time
+
+You have probably wondered why your scatter plot didn't have a clear linear relationship. The reasons were due to the time zone differences as well as the daylight saving time (DST). Modify your R code to solve these issues. 
+
+**Hint:** Check out the `nycflights13::airports` data set. You can _join_ `flights` and `airports` using destination airport FAA code as the _key_.
+
+```{r, collapse=T}
+#?airports
+airports %>% glimpse()
+
+left_join(flights, airports, by=c("dest"="faa")) %>% glimpse()
+```
+
+**INSERT_YOUR_ANSWER**
+
+***
+
+### (f) [50pt] Calculate group-wise summaries - combine `summarise()` and `group_by()`
+
+#### (f.1) [25pt] Daily flight cancellation rate
+
+(i) Suppose we are interested in studying the number of canceled flights per day. Is there a pattern? 
+Make a scatter plot of the proportion of canceled flights per day (x-axis) vs average delay per day (y-axis). 
+Use point size to represent the number of originally scheduled flights on each day. 
+Add a smoothed fitted line to your scatter plot. 
+Is the proportion of canceled flights related to the average delay?
+
+**Hint:** Group `flights` (do not use `not_canceled`) by both month and day, so that your scatter plot has 365 points in total.
+
+**ANSWER**
+```{r}
+
+canceled <- 
+  flights %>%
+  group_by(month, day) %>%
+  summarise(count = n(),
+            canceled_flights = sum(is.na(dep_delay)),
+            canceled_proportion = canceled_flights/count,
+            avg_delay = mean(arr_delay, na.rm = T))
+canceled
+ggplot( data = canceled, mapping = aes(x = canceled_proportion, y = avg_delay)) +
+  geom_point(mapping = aes(size = count), alpha = 1/3) +
+  geom_smooth(se = F)
+
+```
+
+(ii) Which two days had the highest flight cancellation rates?
+
+**ANSWER**
+
+```{r}
+# arrange canceled flights by proportion 
+arrange(canceled, desc(canceled_proportion))
+
+# The days were 2/9 and 2/8
+```
+(iii) Remove the two days with the highest flight cancellation rates and re-draw your scatter plot.
+
+**ANSWER**
+
+```{r}
+# get all flights except the two highest which have a proportion greater than 0.50
+lower_flights <- canceled %>%
+  filter(canceled_proportion <0.50)
+# plot new data
+ggplot( data = lower_flights, mapping = aes(x = canceled_proportion, y = avg_delay)) +
+  geom_point(mapping = aes(size = count), alpha = 1/3) +
+  geom_smooth(se = F)
+```
+
+(iv) What do you think might be the main reason for these two high cancellation rates? Find out supporting evidences from the `nycfights13::weather` data set.
+
+```{r, collapse=T}
+#?weather
+weather %>% glimpse()
+```
+
+**ANSWER** I think the reason for high cancellation rates is that wind_speed was really high, 
+
+***
+
+#### (f.2) [25pt] Best/worst carrier of the year
+
+(i) Suppose we are interested in identifying the carriers with the least/worst delays. To disentangle the effects of bad airports vs. bad carriers, we group all **non-canceled** flights by both carrier and dest, then calculate the average arrival delay for each carrier and dest pair. Make side-by-side boxplots to compare the distribution of average arrival delay among different carriers. Flip your boxplot to have horizontal display and rank all boxes by their median values.
+
+**ANSWER**
+
+```{r}
+# group by carrier and destination then calculate mean delay
+not_canceled <- 
+  not_canceled %>%
+  group_by(carrier, dest) %>%
+  mutate(avg_delay = mean(arr_delay))
+# splot data using median to find the least/worst average delay
+ggplot(data = not_canceled) +
+  geom_boxplot(mapping = aes(x = reorder(carrier, avg_delay, FUN = median), y = avg_delay)) +
+  coord_flip()
+
+```
+
+(ii) Which carrier had the least delays? Which carrier had the worst delays? 
+
+**ANSWER** 
+It looks like the carrier with the worst delays was F9 and the carrier with the least delays was AS. 
+
+(iii) Is there a small `n` problem in your data analysis? Count the number of destinations per carrier.
+
+**Hint:** Check out the `count()` function @ https://dplyr.tidyverse.org/reference/tally.html
+
+**ANSWER**
+```{r}
+# count the number of destinations by carrier and destination
+not_canceled %>%
+  count(carrier, dest) 
+
+```
+
+(iv) Remove the carriers that only flew to one destination. Re-draw your boxplot and re-name the best/worst carriers.
+
+**ANSWER**
+
+```{r}
+# find the carriers that only flew to one destination
+not_canceled %>%
+  count(carrier, dest) %>%
+  group_by(carrier) %>%
+  filter(n == 1)
+# recalculate the new avg mean filtering out carriers with n = 1
+not_canceled_tally <- not_canceled %>%
+  filter(carrier != "9E", carrier != "DL", carrier != "EV", carrier != "OO", carrier !="UA", carrier !="VX") %>%
+  mutate(avg_delay = mean(arr_delay))
+
+#plot new graph with new data
+ggplot(data = not_canceled_tally) +
+  geom_boxplot(mapping = aes(x = reorder(carrier, avg_delay, FUN = median), y = avg_delay)) +
+  coord_flip()
+```
+
+***

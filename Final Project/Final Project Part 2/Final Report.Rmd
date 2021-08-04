@@ -1,0 +1,93 @@
+---
+title: "ProjectReport"
+author: "Deisy Diaz"
+date: "6/2/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.width = 12, fig.height = 6)
+library(ggplot2)
+library(tidyverse)
+library(gridExtra)
+
+```
+
+```{r Load Data}
+setwd("C:/Users/jd100/Desktop/UCR Classes/Spring 21/Stat 167/Final Project")
+video_game_data <- read_csv("Video_Games_Sales.csv")
+
+```
+In our data set, we have a total of 16 variables, listed below with what the variable stands for: 
+  
+1. Name: Name of the game
+  
+2. Platform: Console on which the game is running
+  
+3. Year_of_Release: Year the game was released
+  
+4. Genre: The game’s category
+  
+5. Publisher: Game’s publisher
+  
+6. NA_Sales: Game Sales in North America (in millions of units)
+  
+7. EU_Sales: Game sales in the European Union
+	
+8. JP_Sales: Game sales in Japan
+	
+9. Other_Sales: Game sales in the rest of the world
+	
+10. Global_Sales: Total_Sales in the world
+	
+11. Critic_Score: Aggregate score compiled by Metacritic staff
+	
+12. Critic_Count: The number of critics used for Critic_Score
+	
+13. User_Score: Score by Metacritic’s subscribers
+	
+14. User_Count: Number of users who gave the user_score
+	
+15. Developer: Party responsible for creating the game
+	
+16. Rating: The ESRB rating
+
+we have 8 character variables including: Name, Platform, Year_of_Release, Genre, Publisher, User_Score, Developer, and Rating. We also have 8 numeric variables NA_Sales, EU_Sales, JP_Sales, Other_Sales, Global_Sales, Critic_Score, Critic_Count, and User_Count. Although the variables Year_of_Release, and User_Score were character variables, we needed to convert them to doubles in order use them for our analysis. While all the variables were important, the variables we used to come to our conclusion on which games we recommend being discontinued, were Genre, Platform, Global_Sales and Critic_Score.
+
+Prior to doing any analysis on our data, we first filtered out any missing data. We originally started with 16719 variables but after executing the following code we removed any missing data including any "tbd" (to be determined) values and  ended up with 6947 observations, meaning that about `r 1 - (6947/16719) `% of the data had missing values.
+
+```{r Clean Data}
+video_game_data <- 
+  video_game_data %>%
+  filter(!is.na(Name), !is.na(Platform), !is.na(Year_of_Release), !is.na(Genre), !is.na(Publisher), !is.na(NA_Sales), !is.na(EU_Sales), !is.na(JP_Sales), !is.na(Other_Sales), !is.na(Global_Sales), !is.na(Critic_Score), !is.na(User_Score), User_Score != "tbd", !is.na(Rating), !is.na(Developer))
+
+video_game_data
+
+```
+
+After removing any missing values, I did a count of the number of observations by genre to determine which of the genres had the most and least number of observations.
+
+```{r Count Observations}
+
+ggplot(data = video_game_data) +
+  stat_count(mapping = aes(x = Genre))
+
+```
+Then I analyzed the variance of the data in each numerical column. Although the User_Score variable presented as a character column, it was clearly a double numerical value. In order to analyze the variance of the variable, I converted all it's values to doubles. 
+
+```{r Variance, fig.dim=c(12, 8)}
+video_game_data$User_Score <- as.double(video_game_data$User_Score)
+
+gg <- ggplot(data = video_game_data)
+var1 <- gg + geom_boxplot(mapping = aes(x = NA_Sales), fill = "light blue")
+var2 <- gg + geom_boxplot(mapping = aes(x = EU_Sales), fill = "light blue")
+var3 <- gg + geom_boxplot(mapping = aes(x = JP_Sales), fill = "light blue")
+var4 <- gg + geom_boxplot(mapping = aes(x = Other_Sales), fill = "light blue")
+var5 <- gg + geom_boxplot(mapping = aes(x = Global_Sales), fill = "light blue")
+var6 <- gg + geom_boxplot(mapping = aes(x = Critic_Score), fill = "light blue")
+var7 <- gg + geom_boxplot(mapping = aes(x = User_Score), fill = "light blue")
+
+grid.arrange(var1, var2, var3, var4, var5, var6, var7, ncol = 1)
+
+```
+

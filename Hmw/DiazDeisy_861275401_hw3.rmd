@@ -1,0 +1,221 @@
+---
+title: 'STAT167 HW3 - Spring 2021'
+author: 
+- name: Deisy Diaz Vazquez
+  email: ddiaz022@ucr.edu
+output:
+  html_document:
+    toc: yes
+---
+
+## **Homework #3 instructions**
+
+**Review [textbook Chapter 3 "Data visualization"](https://r4ds.had.co.nz/data-visualisation.html) and lecture notes on `ggplot2` (2021/4/20 & 2021/4/22) before answering the homework questions**.
+
+This homework contains 2 questions, each with multiple parts, 100 points in total.   
+
+<font color="blue">Replace **INSERT_YOUR_ANSWER** with your own answers.</font>
+
+- First open this `rmd` file in RStudio and click `Knit -> Knit to HTML` to render it to HTML format. 
+- It is best to read this `rmd` file and the rendered `html` file side-by-side, while you are working on this homework.
+- If the question asks you to write some R code, remember to put your code into a **R code chunk**. Make sure both your R code chunk and its output are visible in the rendered `html` file.
+- For this homework, use **ggplot2** to visualize your data. Do **NOT** use R base graphics functions.
+
+- <font color="blue">**Please comment your R code thoroughly, and follow the R coding style guideline (https://google.github.io/styleguide/Rguide.xml). Partial credit will be deducted for insufficient commenting or poor coding styles.**</font>
+
+- If you have any question about this homework assignment, we encourage you to post it on [**Piazza**](http://piazza.com/ucr/spring2021/stat167/home).
+
+### **Homework submission guideline**
+
+- **This homework is DUE at _11:59 PM_ on _Sunday April 25, 2021_**.
+- Late submission penalties.  
+    - Submissions up to 24 hours late will incur a 10% deduction.  
+    - Submissions up to 48 hours late will incur a 30% deduction.
+
+- <font color="blue">**If you are using one or both of your free late days, please state here: **</font> **I will be using one of my free late passes.**
+
+- After you complete all questions, save your `rmd` file to `FirstnameLastname-SID-HW3.rmd` and save the rendered `html` or `pdf` file to `FirstnameLastname-SID-HW3.html` or `FirstnameLastname-SID-HW3.pdf`.
+- Submit **BOTH your source `rmd` file and the knitted `html` or `pdf` file** to **GradeScope**. Do NOT create a zip file. You can submit multiple times, you last submission will be graded.
+
+
+
+***
+
+## **Acknowledgments**
+
+<font color="blue">
+Please list all the help you have received for completing this homework.
+</font>
+
+**INSERT_YOUR_ANSWER**
+
+
+***
+
+**Load necessary packages**
+
+```{r, collapse=T}
+# install the tidyverse package first if you have not done it yet.
+#install.packages("tidyverse") # you can comment out this line after you have installed `tidyverse`
+
+library(tidyverse) # for the `ggplot2` package
+```
+
+
+***
+
+## **Question 1 [40pt] Visualization of the `mpg` data set**
+
+This data set contains fuel economy data 1999 - 2008 for 38 popular car models (source: EPA [http://fueleconomy.gov](http://fueleconomy.gov)).
+
+```{r, collapse=T}
+?mpg
+dim(mpg)  # dimension of the table
+names(mpg)  # list the variables in mpg
+str(mpg)  # list the structures in mpg
+glimpse(mpg) # get a glimpse of the mpg data
+```
+
+### (a) [20pt] Visualize the distribution of drive train types
+
+(i) Draw a barplot (frequency histogram) to display the distribution of `drv`, the type of drive train. Use different colors to distinguish different drive train types. Explicitly label the number of car models of each drive train type on top of the bars.
+
+**ANSWER**
+
+```{r, collapse=T}
+# Enter your code here
+ggplot(data = mpg, mapping = aes(x = drv, fill = drv)) + # load mpg data with x = drv and fill by drive
+  geom_bar() + # bar plot
+  geom_text(stat = 'count', # use stat count method
+            mapping = aes(label = ..count..),
+            vjust = -1)
+
+```
+
+(ii) Draw a coxcomb or pie chart to display the proportions of each drive train types.
+
+**ANSWER**
+
+```{r, collapse=T}
+# Enter your code here
+ggplot(data = mpg) + # load mpg data
+  geom_bar(mapping = aes(x = drv, fill = drv), #plot bar 
+           width = 1) + 
+  theme(aspect.ratio = 1)+
+  labs(x = NULL) +
+  coord_polar() # change bar type plot
+
+```
+
+***
+
+### (b) [20pt] How highway mileage varies across drive train type?
+
+Generate a horizontal boxplot to compare the distribution of highway mileage across three different drive train types. Reorder the boxes by the median mileage values.
+
+**INSERT_YOUR_ANSWER**
+
+```{r, collapse=T}
+# Enter your code here
+ggplot(data = mpg) + # load mpg data
+  geom_boxplot(mapping = aes(x = reorder(drv, hwy, FUN = median), y = hwy)) + # bpxplot with x = drv, y = hwy, order by median 
+  coord_flip() # change orientation to horizontal
+
+```
+
+
+***
+
+
+## **Question 2 [60pt] Visualization the `diamonds` data set**
+
+This data set contains the prices and other attributes of almost 54,000 diamonds. 
+
+```{r, collapse=T}
+?diamonds
+dim(diamonds)  # dimension of the table
+diamonds # print/view diamonds
+str(diamonds)  # list the structures in diamonds
+glimpse(diamonds) # get a glimpse of the data
+```
+
+### (a) [20pt] Heatmap of `cut` vs `clarity`
+
+(i) Use [the `geom_tile()` function](https://ggplot2.tidyverse.org/reference/geom_tile.html) to make a heatmap to visualize the number of diamonds in each `cut` and `clarity` combination.
+
+**ANSWER**
+
+```{r, collapse=T}
+# Enter your code here
+
+ggplot(data = count(x = diamonds, cut, clarity)) + # load diamond data, cut and clarity
+geom_tile(mapping = aes(x = cut, y = clarity, fill = n)) # plot tile by x = cut, y = clatiy, and fill by count 
+
+```
+
+(ii) Change the color palette of your heatmap.
+
+**Hint**: See [these heatmap examples at the R Graph Gallery](https://www.r-graph-gallery.com/79-levelplot-with-ggplot2.html).
+
+**ANSWER**
+
+```{r, collapse=T}
+# Enter your code here
+
+ggplot(data = count(x = diamonds, cut, clarity)) + # load diamond data, cut and clarity
+geom_tile(mapping = aes(x = cut, y = clarity, fill = n)) + # plot tile by x = cut, y = clatiy, and fill by count 
+  scale_fill_gradient(low = "red", high = "pink") # fill gradient by red for low and pink for high count
+```
+
+***
+
+### (b) [40pt] Visualize the distribution of diamond price
+
+(i) Use [the `geom_histogram()` function](http://ggplot2.tidyverse.org/reference/geom_histogram.html) to compare the distribution of `price` across different `cut`. Change the y-axis to density, and use the `dodge` position adjustment.
+
+**ANSWER**
+
+```{r, collapse=T}
+# Enter your code here
+ggplot(data = diamonds) + # load diamonds data
+  geom_histogram(aes(x = price, y = ..density.., fill = cut), position = "dodge") # plot histogram with x = price, y = density, and dill by cut, with position = "dodge"
+
+```
+
+(ii) Use [the `geom_freqpoly()` function](http://ggplot2.tidyverse.org/reference/geom_histogram.html) to compare the distribution of `price` across different `cut`. Change the y-axis to density.
+
+**ANSWER**
+
+```{r, collapse=T}
+# Enter your code here
+ggplot( data = diamonds) + # load diamond data
+  geom_freqpoly(aes(x = price, y = ..density.., color = cut))# plot frqpoly by x = price, y = density, and color = cut
+
+```
+
+(iii) Use [the `geom_boxplot()` function](https://ggplot2.tidyverse.org/reference/geom_boxplot.html) to compare the distribution of `price` across different `cut`.
+
+**ANSWER**
+
+```{r, collapse=T}
+# Enter your code here
+ggplot(data = diamonds) + # load diamond data
+  geom_boxplot(mapping = aes(x = cut, y = price)) # plot a boxplot by x = cut, y = price
+
+```
+
+(iv) Use [the `geom_violin()` function](https://ggplot2.tidyverse.org/reference/geom_violin.html
+) to compare the distribution of `price` across different `cut`.
+
+**ANSWER**
+
+```{r, collapse=T}
+# Enter your code here
+ggplot( data = diamonds)+ # load diamonds data
+  geom_violin(mapping = aes(x = cut, y = price)) # plot violon with x = cut and y = price
+
+```
+
+(v) What observations can you make from the above plots? Which visualization function is your favorite? Explain your choice.
+
+**ANSWER:** From the above plots, all diamonds can range from low to high but the premium cut diamonds have the highest average price. Of the above plots, I like the histogram plot better because it's easier to visualize and understand. The violon plot is nice too but it's a little harder to tell where each diamonds mediam by cut is.

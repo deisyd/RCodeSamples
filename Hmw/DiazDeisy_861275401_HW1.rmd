@@ -1,0 +1,360 @@
+---
+title: 'STAT167 HW1 - Spring 2021'
+author: 
+- name: Deisy Diaz
+  email: ddiaz022@ucr.edu
+output:
+  html_document:
+    toc: yes
+---
+
+## **Homework #1 instructions**
+
+**Review 2021/4/1, 2021/4/6, and 2021/4/8 lecture notes before answering the homework questions**.
+
+This homework contains 2 questions, each with multiple parts, 100 points in total. 
+
+<font color="blue">Replace **INSERT_YOUR_ANSWER** with your own answers.</font>
+
+- First open this `rmd` file in RStudio and click `Knit -> Knit to HTML` to render it to HTML format. 
+- It is best to read this `rmd` file and the rendered `html` file side-by-side, while you are working on this homework.
+- If the question asks you to write some R code, remember to put your code into a **R code chunk**. Make sure both your R code chunk and its output are visible in the rendered `html` file.
+- For this homework, use **R Base Graphics** to generate the figures. Do **NOT** use `ggplot2` for this homework.
+
+- <font color="blue">**Please comment your R code thoroughly, and follow the R coding style guideline (https://google.github.io/styleguide/Rguide.xml). Partial credit will be deducted for insufficient commenting or poor coding styles.**</font>
+
+- If you have any question about this homework assignment, we encourage you to post it on [**Piazza**](http://piazza.com/ucr/spring2021/stat167/home).
+
+### **Homework submission guideline**
+
+- **This homework is DUE at _11:59 PM_ on _Sunday April 11, 2021_**.
+- Late submission penalties.  
+    - Submissions up to 24 hours late will incur a 10% deduction.  
+    - Submissions up to 48 hours late will incur a 30% deduction.
+
+- <font color="blue">**If you are using one or both of your free late days, please state here: **</font> **INSERT_YOUR_ANSWER**
+
+- After you complete all questions, save your `rmd` file to `FirstnameLastname-SID-HW1.rmd` and save the rendered html or pdf file to `FirstnameLastname-SID-HW1.html` or `FirstnameLastname-SID-HW1.pdf`.
+- Submit **BOTH your source `rmd` file and the knitted `html` or `pdf` file** to **GradeScope**. Do NOT create a zip file. You can submit multiple times, you last submission will be graded.
+
+***
+
+## **Acknowledgments**
+
+<font color="blue">
+Please list all the help you have received for completing this homework.
+</font>
+
+**INSERT_YOUR_ANSWER**
+
+
+***
+
+**Load necessary packages**
+
+```{r, collapse=T}
+library(datasets) # for the `quakes` data set
+
+## You need to install the maps package first, then you can comment out the following line.
+# install.packages("maps")
+
+library(maps) # for map visualization
+```
+
+
+***
+
+## **Question 1 [70pt] Analysis of the `quakes` data set**
+
+The `quakes` data set give the locations of 1000 seismic events of MB > 4.0. The events occurred in a cube near Fiji since 1964.
+
+\footnotesize
+```{r}
+library(datasets) # we have already loaded the package but we can do it again
+?quakes 
+```
+
+```{r, collapse=T}
+class(quakes)
+head(quakes, n=5) # print first 5 rows of quakes
+dim(quakes)  # dimension of the table
+names(quakes)  # list the variables in quakes
+str(quakes)  # list the structures in quakes
+```
+
+### (a) [10pt] Visualizations of the earthquake magnitudes
+
+Suppose we are interested in studying the distribution of the magnitude `mag` variable. Write your own R code to make a single figure with the following four subfigures in a 2-by-2 layout.  
+
+- subfigure #1: plot a density histogram of the earthquake magnitudes, and then plot the estimated probability density curve in red color in the same plot
+- subfigure #2: plot a horizontal boxplot of the earthquake magnitudes
+- subfigure #3: plot the empirical cdf of the earthquake magnitudes
+- subfigure #4: make a Q-Q plot to compare the observed earthquake magnitudes distribution with the theoretical Normal distribution. Add a *thick* qqline in blue color.  
+
+[**Note**: make sure each subfigure has proper axis labels and figure title.]
+
+**ANSWER**
+```{r}
+par(mfrow = c(2,2)) # 2 by 2 layout
+hist(quakes$mag, freq = F, main = "Histogram of Magnitudes", xlab = "Magnitude") # make a histogram with labels main and xaxis
+lines(density(quakes$mag), lwd = 3, col = "red") # plot density curve as red
+boxplot(quakes$mag, horizontal = T, at = 0.5, border = "blue", main = "Boxplot of Magnitudes", xlab = "Magnitudes") # make a boxplot in blue 
+plot(ecdf(quakes$mag), main = "Empirical CDF of Magnitudes") # plot cdf 
+qqnorm(quakes$mag) # make a qq plot
+qqline(quakes$mag, lwd = 3, lty = 4, col = "blue") # make a qq line
+
+```
+
+
+### (b) [10pt] Outlier detection
+
+There are several outliers labeled by open circles in the boxplot. Write a simple code to print out the indexes of the outliers and then print out the outlier observations.  
+
+[**Hint**: you can use the `summary()` function to find out $Q_1$ and $Q_3$.]
+
+**ANSWER**
+```{r}
+summary(quakes$mag) # summarize mag
+max_outliers <- quakes$mag[quakes$mag>4.9] # find upper outliears
+cat("\nUpper outliers:", max_outliers) # print upper outliers
+min_outliers <- quakes$mag[quakes$mag<4.30] # find lower outliers
+cat("\nLower outliers:", min_outliers) # print lower outliers
+total_outliers <- sum(quakes$mag>4.9) + sum(quakes$mag<4.30) # count toal outliers
+cat("\nTotal outliers:", total_outliers) # print total outliers
+```
+
+How many outliers have you found?
+
+**ANSWER:** There are a total of 389.
+
+
+### (c) [10pt] Minimum variance unbiased estimates for Normal distribution
+
+Suppose we assume that the earthquake magnitude variable follows a Normal distribution and our 1000 earthquake magnitude observations are independent and identically distributed (iid). 
+
+That is, $X_i \sim N(\mu, \sigma^2)$, where $X_i$ is the magnitude of the $i$-th earthquake observation and $i=1,2,\cdots,1000$.  
+
+The **minimum variance unbiased estimators (MVUE)** for $\mu$ and $\sigma^2$ are:
+$$
+\widehat{\mu}=\overline{X}=\frac{1}{n}\sum_{i=1}^n X_i \\
+\widehat{\sigma^2}=S^2=\frac{1}{n-1}\sum_{i=1}^n (X_i - \overline{X})^2
+$$
+
+Use existing R functions to calculate the estimates of $\widehat{\mu}$ and $\widehat{\sigma^2}$.
+
+**ANSWER:**
+```{r}
+n <- length(quakes$mag) # get length of mag
+sum(quakes$mag)/n # find mean
+sum((quakes$mag-mean(quakes$mag))^2)/(n-1) # find sigma
+```
+
+Do NOT use any existing R functions, write your own R code to calculate the estimates of $\widehat{\mu}$ and $\widehat{\sigma^2}$.
+
+**ANSWER:**
+```{r}
+n <- length(quakes$mag) # save length of mag in n
+total_sum <- 0 # initiate sum variable
+for ( i in 1:n){ # go from 1 to length of mag
+  total_sum <- total_sum+quakes$mag[i] # sum up the value of mag at i 
+}
+mean <- total_sum/n # find mean
+mean # print to check
+diff_sum <- 0 # initiate diff sum variable
+for ( i in 1:n){ # go from 1 to length of mag
+  calc_at_i <- (quakes$mag[i] - mean)^2 # calculate value of difference at i
+  diff_sum <- diff_sum + calc_at_i # add calculated value to initiate diff sum value
+
+}
+sigma <- diff_sum/(n-1) # culculate sigma
+sigma # print to check
+```
+
+
+### (d) [10pt] Visualize your model fitness
+
+To visualize the model fitness, you can add the estimated Normal distribution curve to the histogram plot you have generated in part (a).
+
+Write your own code to generate the following figure.  
+
+- make a density histogram first, set `xlim` from 0 to 8.
+- plot the empirical density curve in red color on the same figure.
+- plot the estimated Normal distribution curve (that is, $X \sim N(\widehat{\mu}, \widehat{\sigma^2})$) as a blue dashed line on the same figure.
+
+**ANSWER**
+```{r}
+hist(quakes$mag, freq = F, main = "Histogram of Magnitudes", xlab = "Magnitude", xlim = c(0,8)) # label the main graph, x axis and set a limit
+lines(density(quakes$mag), col = "red") # plot empirical density curve in red
+z <- seq(0,8, length = 100) # create a sequence from 0 to 8 broken into 100
+prob_z <- dnorm(z, mean = 4.6204, sd = 0.1622) # get dnorm values for calculated mean and sd
+lines(z, prob_z, col = "blue", lty = 2) # plot normal distribution curve as a blue dashed line
+```
+
+How does your estimated normal curve differ from the empirical density curve? Do you think the earthquake magnitude observations follow a Normal distribution? Does this result consist with the Q-Q plot you generated in part (a).
+
+**ANSWER:** The curve is a little higher along the y axis but it generally follows a normal distribution. It does consist with the qq plot generated in part a.
+
+
+### (e) [10pt] Pairwise scatterplots
+
+Run the following code. 
+```{r}
+# require(graphics) # load the graphics library
+
+pairs(quakes, main = "Fiji Earthquakes, N = 1000", cex.main=1.2, pch=".")
+```
+
+Describe the output figure. 
+
+**ANSWER:** The code outputs a 5 by 5 matrix of scatterplots.
+
+Do you think the `mag` variable and `stations` variables are positively correlated? Explain your answer.
+
+**ANSWER:** Yes, they are positively correlated. As the points move across the x axis, the points are higher along the y axis. 
+
+
+### (f) [10pt] Single scatterplot 
+
+Write your own R code to reproduce the scatterplot for the `mag` and `stations` variables.  
+
+- calculate the covariance and correlation coefficient. [**Hint**: look up the `cor` package.]
+- redraw the outlier points you identified in (b) using red color filled diamond symbol.
+- add a three-line legend to your plot. The first legend line reports the covariance value; the second legend line reports the correlation coefficient value; and the third legend line indicates the red diamonds are likely outliers.
+
+**ANSWER:**
+```{r}
+cor(quakes$mag,quakes$stations) # calculate correlation
+cov(quakes$mag,quakes$stations) # calculate covariance
+
+plot(quakes$mag, quakes$stations, pch = 18) # plot all plots
+points(quakes$mag[quakes$mag>4.9], quakes$stations[quakes$mag>4.9], col = 2, pch = 18) # plot upper outliers as red diamonds
+points(quakes$mag[quakes$mag<4.3], quakes$stations[quakes$mag<4.3], col = 2, pch = 18) # plot lower outliers as red diamonds
+
+legend("topleft", legend = c("Correlation: 0.8511", "Covariance: 7.5082", "Likely Outliears"), col = c(1,1,2), pch = c(20, 20, 18))
+# legend with three lines correlation,covariance, and likely outliers
+
+```
+
+
+
+### (g) [10pt] Earthquake maps
+
+We can plot our earthquake records on a world map using the `maps` package. Look at the following map. Where is Fiji?
+
+**ANSWER:** Fiji is located in the area where the red dots are. Along the bottom left of the map.
+
+```{r, collapse=T}
+library(maps)
+map()
+points(quakes$long, quakes$lat, pch=".", col="red")
+```
+
+We can also zoom in and make local map of Fiji and its neighborhood area.
+
+```{r, collapse=T}
+long.mean <- mean(quakes$long)
+lat.mean <- mean(quakes$lat)
+#orient <- c(lat.mean, long.mean, 0)
+xlim <- c(min(quakes$long)/2, max(quakes$long)*1.5)
+ylim <- c(min(quakes$lat)-10, max(quakes$lat)+10)
+map(database="world", xlim=xlim, ylim=ylim, col="grey80", fill=T)
+```
+
+Add our earthquake locations into the above plot as red color dots. Use blue color filled rectangles to mark locations of the outliers identified in part (b).
+
+**ANSWER:**
+```{r, collapse=T}
+long.mean <- mean(quakes$long)
+lat.mean <- mean(quakes$lat)
+#orient <- c(lat.mean, long.mean, 0)
+xlim <- c(min(quakes$long)/2, max(quakes$long)*1.5)
+ylim <- c(min(quakes$lat)-10, max(quakes$lat)+10)
+map(database="world", xlim=xlim, ylim=ylim, col="grey80", fill=T)
+points(quakes$long, quakes$lat, pch=".", col="red") # plot all points in red
+points(quakes$long[quakes$mag>4.9], quakes$lat[quakes$mag>4.9], pch=15, col="blue") # plot all upper outliers as blue rectangle
+points(quakes$long[quakes$mag<4.3], quakes$lat[quakes$mag<4.3], pch=15, col="blue") # plot all lower outliers as blue rectangles
+``` 
+
+***
+
+## **Question 2 [30pt] Introductory Survey**
+
+Take a few minutes to complete the following short survey. _For multiple choice questions, mark appropriate answers using **bold** text_. Note that as long as your complete this survey, you will receive full credit for this question.
+
+### (a) What is your major and concentration (for your degree)?
+
+**ANSWER:** Applied mathematics, general concentration. 
+ 
+### (b) What is your minor (if any)?
+
+**ANSWER:** None.
+ 
+### (c) Why did you decide to take STAT167?
+
+**ANSWER:** I want to learn more about data science as I plan on Data Science being my career sometime in the future.
+
+### (d) What would you like to get out of this course?
+
+**ANSWER:** I want to learn more about data science applications and machine learning/deep learning.
+
+### (e) What operating system(s) do you run on your primary computer(s)?  
+[Mark your answer in **bold**].  
+
+- **Windows**
+- Mac OS X
+- Linux
+- Other: please specify
+
+### (f) What programming languages do you know?   
+[Mark all that apply in **bold**].  
+
+- BASIC
+- C
+- **C++**
+- C#
+- Java
+- JavaScript
+- **HTML / CSS**
+- LISP (lisp, scheme, clojure, etc)
+- Perl
+- PHP
+- **Python**
+- Ruby
+- SQL
+- VB / VBScript
+- **R**
+- SAS
+- **Matlab**
+- Julia
+- Scala
+- Other: please specify
+
+### (g) What is your primary programming language?  
+
+**ANSWER:** I use to be proficient in C++ but after not using it for long I'm rusty so I'll say R.
+
+### (h) How often do you write code (before taking this class)?  
+[Mark your answer in **bold**].  
+
+- daily
+- two or more time per week
+- **once per week**
+- less than once per week
+- little to no programming experience
+ 
+### (i) Overall, how comfortable are you with programming?  
+[Mark your answer in **bold**].  
+
+- 1 (less comfortable)
+- 2
+- 3
+- **4**
+- 5 (very comfortable)
+
+### (j) What probability and statistics courses have you already taken, if any?
+
+**ANSWER:** Stats 100AB, Stat 147
+ 
+###(k) What computer science courses have you already taken, if any?
+
+**Answer:** Cs10, Cs12
